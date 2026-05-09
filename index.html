@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sistema Igreja - Assembleia de Deus</title>
+
+  <!-- PWA META TAGS -->
+  <meta name="application-name" content="Igreja AD">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Igreja AD">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#a8edea">
+  <meta name="description" content="Sistema de Gestão - Assembleia de Deus Magalhães Bastos">
+
+  <!-- PWA MANIFEST -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- APPLE TOUCH ICONS -->
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="icons/icon-96.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+      min-height: 100vh;
+      /* Evita bounce no iOS */
+      overscroll-behavior: none;
+    }
+
+    /* ===== BANNER DE INSTALAÇÃO PWA ===== */
+    #installBanner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 18px;
+      padding: 14px 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      z-index: 9999;
+      align-items: center;
+      gap: 14px;
+      max-width: 360px;
+      width: 90%;
+      border: 1px solid #f0f2f5;
+      animation: slideUp 0.4s ease;
+    }
+    #installBanner.show { display: flex; }
+    @keyframes slideUp { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+    #installBanner .banner-icon { font-size: 2em; }
+    #installBanner .banner-text { flex: 1; }
+    #installBanner .banner-text strong { display: block; font-size: 0.9em; color: #2c3e50; }
+    #installBanner .banner-text small { color: #a0aec0; font-size: 0.75em; }
+    #installBanner .btn-install {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      border: none; border-radius: 10px; padding: 8px 14px;
+      font-weight: 600; font-size: 0.8em; cursor: pointer; color: #4a5568;
+      white-space: nowrap;
+    }
+    #installBanner .btn-dismiss {
+      background: none; border: none; color: #a0aec0;
+      font-size: 1.2em; cursor: pointer; padding: 2px;
+    }
+
+    /* ===== LOGIN ===== */
+    .login-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      display: flex; justify-content: center; align-items: center; z-index: 2000;
+    }
+    .login-box {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 30px; padding: 40px; width: 90%; max-width: 450px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+      animation: fadeInUp 0.5s ease;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .login-box h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+    .login-box h1 i { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .login-box .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 0.9em; }
+    .login-box input {
+      width: 100%; padding: 14px 15px; margin-bottom: 15px;
+      border: 2px solid #e8ecf1; border-radius: 12px; font-size: 15px;
+      background: #f8fafc; transition: all 0.3s;
+    }
+    .login-box input:focus { border-color: #a8edea; outline: none; background: white; }
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #4a5568; border: none; border-radius: 12px; font-size: 16px;
+      font-weight: 600; cursor: pointer; transition: all 0.3s;
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .login-error { background: #fff5f5; color: #e53e3e; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: none; border-left: 4px solid #e53e3e; }
+    .login-version { text-align: center; margin-top: 15px; font-size: 0.7em; color: #a0aec0; }
+
+    /* ===== APP ===== */
+    .app-container { display: none; min-height: 100vh; background: #f5f7fa; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 220px; height: 100%;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      color: #2c3e50; z-index: 100; overflow-y: auto;
+      transition: left 0.3s ease; box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+    }
+    .sidebar-logo {
+      padding: 25px 20px; text-align: center;
+      border-bottom: 1px solid #e8ecf1; margin-bottom: 20px;
+    }
+    .sidebar-logo i {
+      font-size: 2.5em;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 10px;
+    }
+    .sidebar-logo h3 { font-size: 1.1em; color: #2c3e50; font-weight: 600; }
+    .sidebar-logo p { font-size: 0.7em; color: #a0aec0; margin-top: 5px; }
+    .nav-item {
+      padding: 12px 20px; margin: 4px 12px;
+      display: flex; align-items: center; gap: 12px;
+      color: #4a5568; cursor: pointer; transition: all 0.3s;
+      border-radius: 12px; font-size: 0.9em;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: linear-gradient(135deg, #a8edea20 0%, #fed6e320 100%);
+      color: #667eea;
+    }
+    .nav-item i { width: 22px; font-size: 1.1em; }
+
+    /* Main Content */
+    .main-content { margin-left: 220px; padding: 20px; transition: margin-left 0.3s ease; }
+
+    /* Top Bar */
+    .top-bar {
+      background: white; border-radius: 20px; padding: 12px 25px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border: 1px solid #f0f2f5;
+    }
+    .top-bar h2 { font-size: 1.2em; color: #2c3e50; font-weight: 600; }
+    .top-bar h2 i { color: #a8edea; margin-right: 8px; }
+    .user-info {
+      display: flex; align-items: center; gap: 15px;
+      background: #f8fafc; padding: 6px 15px 6px 8px;
+      border-radius: 50px; transition: all 0.3s;
+    }
+    .user-info:hover { background: #f0f2f5; }
+    .user-avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: bold; font-size: 1em; color: #4a5568;
+    }
+    .user-details { display: flex; flex-direction: column; align-items: flex-start; }
+    .user-name { font-weight: 600; font-size: 0.85em; color: #2c3e50; }
+    .user-role {
+      background: #e8f5e8; color: #48bb78;
+      padding: 2px 8px; border-radius: 20px;
+      font-size: 10px; font-weight: 600; margin-top: 2px;
+    }
+    .logout-btn {
+      background: #fed7d7; border: none; color: #c53030;
+      cursor: pointer; font-size: 0.9em; padding: 6px 12px;
+      border-radius: 30px; transition: all 0.3s;
+      display: flex; align-items: center; gap: 6px; font-weight: 500;
+    }
+    .logout-btn:hover { background: #feb2b2; transform: scale(1.02); }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Finance Stats */
+    .finance-stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .finance-stat-card {
+      flex: 1; min-width: 130px; background: white;
+      border-radius: 14px; padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #f0f2f5; transition: all 0.3s;
+    }
+    .finance-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+    .finance-stat-card .info .value { font-size: 1.3em; font-weight: 700; }
+    .finance-stat-card .info .label { font-size: 0.7em; color: #a0aec0; margin-top: 3px; }
+    .finance-stat-card i { font-size: 1.5em; opacity: 0.6; }
+    .finance-stat-card.entradas i { color: #48bb78; }
+    .finance-stat-card.entradas .value { color: #48bb78; }
+    .finance-stat-card.saidas i { color: #f56565; }
+    .finance-stat-card.saidas .value { color: #f56565; }
+    .finance-stat-card.saldo .value.positive { color: #48bb78; }
+    .finance-stat-card.saldo .value.negative { color: #f56565; }
+    .finance-stat-card.saldo i { color: #a8edea; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white; border-radius: 20px; padding: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #f0f2f5; transition: all 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card .value { font-size: 1.6em; font-weight: 700; color: #2c3e50; }
+    .stat-card .label { color: #a0aec0; font-size: 0.8em; margin-top: 5px; }
+    .stat-card i { font-size: 2em; color: #a8edea; }
+
+    /* Content Card */
+    .content-card {
+      background: white; border-radius: 20px; padding: 20px;
+      margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #f0f2f5;
+    }
+    .content-card h3 {
+      color: #2c3e50; margin-bottom: 15px; font-weight: 600;
+      padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; font-size: 1.05em;
+    }
+    .content-card h3 i { margin-right: 8px; color: #a8edea; }
+
+    /* Forms */
+    .form-grid-small { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4a5568; font-size: 0.75em; }
+    .form-group label i { margin-right: 5px; color: #a8edea; }
+    .form-control {
+      width: 100%; padding: 8px 12px;
+      border: 2px solid #e8ecf1; border-radius: 10px;
+      font-size: 12px; transition: all 0.3s; background: #fafbfc;
+    }
+    .form-control:focus { border-color: #a8edea; outline: none; background: white; }
+    .input-group-categoria { display: flex; gap: 8px; align-items: center; }
+    .input-group-categoria .form-control { flex: 1; }
+    .btn-icon {
+      padding: 8px 12px; background: #f8fafc;
+      border: 2px solid #e8ecf1; border-radius: 10px; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-icon:hover { background: #a8edea20; border-color: #a8edea; }
+
+    /* Botões */
+    .btn { padding: 8px 18px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 12px; }
+    .btn-primary { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #4a5568; }
+    .btn-success { background: #c6f6d5; color: #276749; }
+    .btn-danger { background: #fed7d7; color: #c53030; }
+    .btn-warning { background: #feebc8; color: #975a16; }
+    .btn-whatsapp { background: #dcfce7; color: #276749; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 8px; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    /* Tables */
+    .table-container { overflow-x: auto; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 600; color: #4a5568; border-bottom: 2px solid #e8ecf1; font-size: 12px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f0f2f5; color: #4a5568; font-size: 12px; }
+    tr:hover { background: #fafbfc; }
+    .table-img { width: 35px; height: 35px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #e8ecf1; }
+
+    /* Image Modal */
+    .img-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
+    .img-modal.active { display: flex; }
+    .img-modal img { max-width: 90%; max-height: 90%; border-radius: 12px; object-fit: contain; }
+    .close-img-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; background: none; border: none; }
+
+    /* Camera */
+    .input-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .camera-btn { background: #f8fafc; border: 2px solid #e8ecf1; border-radius: 10px; padding: 7px 12px; font-size: 11px; cursor: pointer; color: #4a5568; transition: all 0.3s; }
+    .camera-btn:hover { background: #a8edea20; border-color: #a8edea; }
+    .file-name { font-size: 10px; color: #a0aec0; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .image-preview-small { width: 45px; height: 45px; object-fit: cover; border-radius: 10px; margin-top: 6px; cursor: pointer; border: 1px solid #e8ecf1; display: none; }
+    .image-preview-small.active { display: block; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 7px 16px; background: #f8fafc; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s; font-weight: 500; color: #4a5568; font-size: 12px; }
+    .tab.active { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #4a5568; }
+
+    /* Search */
+    .search-box { margin-bottom: 15px; position: relative; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0; font-size: 12px; }
+    .search-box input { width: 100%; padding: 8px 12px 8px 35px; border: 2px solid #e8ecf1; border-radius: 25px; background: #fafbfc; font-size: 12px; }
+
+    /* Ministérios */
+    .ministerios-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+    .ministerio-tag { background: #f8fafc; border: 1px solid #e8ecf1; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #4a5568; display: inline-flex; align-items: center; gap: 8px; }
+    .ministerio-tag i { color: #a8edea; font-size: 12px; }
+
+    /* WhatsApp */
+    .grupos-list { max-height: 250px; overflow-y: auto; }
+    .grupo-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #f0f2f5; cursor: pointer; border-radius: 8px; }
+    .grupo-item:hover { background: #fafbfc; }
+    .grupo-item input { margin-right: 10px; width: 16px; height: 16px; accent-color: #a8edea; }
+    .preview-message { background: #fafbfc; padding: 10px; border-radius: 10px; margin-top: 12px; font-size: 11px; border-left: 3px solid #48bb78; white-space: pre-wrap; }
+
+    /* Charts */
+    .charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .chart-card { background: white; border-radius: 20px; padding: 15px; border: 1px solid #f0f2f5; }
+    .chart-card h3 { margin-bottom: 12px; font-size: 0.9em; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 2000; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 20px; padding: 20px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; }
+
+    /* Filter */
+    .filter-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px; }
+    .filter-group { flex: 1; min-width: 120px; }
+
+    /* Status */
+    .status-ativo { color: #48bb78; font-weight: 600; }
+    .status-inativo { color: #f56565; font-weight: 600; }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 30px; color: #a0aec0; }
+    .empty-state i { font-size: 2.5em; margin-bottom: 10px; opacity: 0.5; }
+
+    /* Menu Toggle */
+    .menu-toggle {
+      display: none; position: fixed; top: 15px; left: 15px; z-index: 200;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #4a5568; border: none; padding: 10px 14px;
+      border-radius: 12px; cursor: pointer; font-size: 1.1em;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 99;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    /* ===== RESPONSIVO ===== */
+    @media (max-width: 768px) {
+      .sidebar { left: -220px; z-index: 200; }
+      .sidebar.open { left: 0; }
+      .main-content { margin-left: 0; padding: 70px 15px 20px; }
+      .menu-toggle { display: block; }
+      .finance-stats { flex-direction: column; }
+      .finance-stat-card { min-width: auto; }
+      .user-info { padding: 4px 10px 4px 6px; }
+      .user-name { font-size: 0.75em; }
+      .logout-btn span { display: none; }
+      .logout-btn { padding: 6px 10px; }
+      .top-bar { padding: 10px 15px; border-radius: 14px; }
+      .top-bar h2 { font-size: 1em; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .charts-section { grid-template-columns: 1fr; }
+      #installBanner { bottom: 10px; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-card { padding: 15px; }
+      .stat-card .value { font-size: 1.3em; }
+      .form-grid-small { grid-template-columns: 1fr; }
+      .tabs { gap: 5px; }
+      .tab { padding: 6px 10px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PWA INSTALL BANNER -->
+<div id="installBanner">
+  <div class="banner-icon">⛪</div>
+  <div class="banner-text">
+    <strong>Instalar Igreja AD</strong>
+    <small>Adicionar à tela inicial</small>
+  </div>
+  <button class="btn-install" id="installBtn">Instalar</button>
+  <button class="btn-dismiss" id="dismissBtn">&times;</button>
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="img-modal" onclick="fecharImageModal()">
+  <button class="close-img-modal" onclick="fecharImageModal()">&times;</button>
+  <img id="modalImage" src="">
+</div>
+
+<!-- MODAL CATEGORIA -->
+<div id="categoriaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-tag"></i> Nova Categoria</h3>
+      <button onclick="fecharCategoriaModal()" style="background:none;border:none;font-size:20px;cursor:pointer">&times;</button>
+    </div>
+    <div id="categoriaModalBody"></div>
+    <div style="margin-top:15px; text-align:right">
+      <button class="btn btn-success" onclick="salvarNovaCategoria()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-container">
+  <div class="login-box">
+    <h1><i class="fas fa-church"></i> Sistema Igreja</h1>
+    <div class="subtitle">Assembleia de Deus - Magalhães Bastos</div>
+    <div id="loginError" class="login-error"></div>
+    <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="username">
+    <input type="password" id="loginSenha" placeholder="Senha" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter') fazerLogin()">
+    <button class="login-btn" onclick="fazerLogin()">
+      <i class="fas fa-sign-in-alt"></i> Entrar
+    </button>
+    <div class="login-version">v1.0 PWA • Funciona offline</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appContainer" class="app-container">
+  <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenu()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fas fa-church"></i>
+      <h3>Igreja AD</h3>
+      <p>Magalhães Bastos</p>
+    </div>
+    <div class="nav-menu" id="navMenu"></div>
+  </div>
+
+  <div class="main-content">
+    <div class="top-bar">
+      <h2 id="pageTitle"><i class="fas fa-chart-pie"></i> Dashboard</h2>
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">A</div>
+        <div class="user-details">
+          <span class="user-name" id="userName">Carregando...</span>
+          <span class="user-role" id="userRole"></span>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="pageDashboard" class="page active">
+      <div class="stats-grid" id="dashboardStats"></div>
+      <div class="charts-section">
+        <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Movimentação</h3><canvas id="financasChart"></canvas></div>
+        <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> Membros por Ministério</h3><canvas id="ministeriosChart"></canvas></div>
+      </div>
+      <div class="content-card"><h3><i class="fas fa-calendar-alt"></i> Próximos Eventos</h3><div id="proximosEventos"></div></div>
+    </div>
+
+    <!-- MEMBROS -->
+    <div id="pageMembros" class="page">
+      <div class="content-card">
+        <div class="tabs">
+          <button class="tab active" onclick="showMembrosTab('cadastro',this)"><i class="fas fa-user-plus"></i> Novo</button>
+          <button class="tab" onclick="showMembrosTab('lista',this)"><i class="fas fa-list"></i> Lista</button>
+          <button class="tab" onclick="showMembrosTab('ministerios',this)"><i class="fas fa-church"></i> Ministérios</button>
+        </div>
+        <div id="membrosCadastro" class="membros-tab">
+          <div class="form-grid-small">
+            <div class="form-group"><label><i class="fas fa-user"></i> Nome *</label><input type="text" id="membroNome" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-birthday-cake"></i> Nascimento</label><input type="date" id="membroDataNasc" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-venus-mars"></i> Sexo</label><select id="membroSexo" class="form-control"><option>Masculino</option><option>Feminino</option></select></div>
+            <div class="form-group"><label><i class="fas fa-id-card"></i> CPF</label><input type="text" id="membroCpf" class="form-control" placeholder="000.000.000-00"></div>
+            <div class="form-group"><label><i class="fas fa-envelope"></i> E-mail</label><input type="email" id="membroEmail" class="form-control"></div>
+            <div class="form-group"><label><i class="fab fa-whatsapp"></i> WhatsApp *</label><input type="tel" id="membroWhatsapp" class="form-control" placeholder="(21) 99999-9999"></div>
+            <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Endereço</label><input type="text" id="membroEndereco" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-city"></i> Bairro</label><input type="text" id="membroBairro" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-church"></i> Ministério</label><select id="membroMinisterio" class="form-control"></select></div>
+            <div class="form-group"><label><i class="fas fa-check-circle"></i> Status</label><select id="membroStatus" class="form-control"><option>Ativo</option><option>Inativo</option><option>Transferido</option></select></div>
+            <div class="form-group"><label><i class="fas fa-hand-holding-usd"></i> Dizimista</label><select id="membroDizimista" class="form-control"><option>Sim</option><option>Não</option></select></div>
+          </div>
+          <div style="text-align:right"><button class="btn btn-success" onclick="salvarMembro()"><i class="fas fa-save"></i> Salvar</button></div>
+        </div>
+        <div id="membrosLista" class="membros-tab" style="display:none">
+          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="buscarMembro" placeholder="Buscar..." onkeyup="filtrarMembros()"></div>
+          <div class="table-container"><table><thead><tr><th>ID</th><th>Nome</th><th>WhatsApp</th><th>Ministério</th><th>Dizimista</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaMembros"></tbody></table></div>
+        </div>
+        <div id="membrosMinisterios" class="membros-tab" style="display:none">
+          <div class="form-grid-small">
+            <div class="form-group"><label><i class="fas fa-plus-circle"></i> Novo Ministério</label><input type="text" id="novoMinisterioNome" class="form-control" placeholder="Ex: Dança, Teatro"></div>
+          </div>
+          <div style="text-align:right"><button class="btn btn-primary" onclick="adicionarMinisterio()"><i class="fas fa-plus"></i> Adicionar</button></div>
+          <div style="margin-top:20px"><h4><i class="fas fa-list"></i> Ministérios Cadastrados</h4><div id="listaMinisteriosContainer" class="ministerios-list"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIZIMISTAS -->
+    <div id="pageDizimistas" class="page">
+      <div class="stats-grid" id="dizimistasStats"></div>
+      <div class="content-card">
+        <h3><i class="fas fa-hand-holding-usd"></i> Registrar Dízimo</h3>
+        <div class="form-grid-small">
+          <div class="form-group"><label><i class="fas fa-calendar"></i> Data</label><input type="date" id="dizimoData" class="form-control"></div>
+          <div class="form-group"><label><i class="fas fa-user"></i> Dizimista</label><select id="dizimoMembro" class="form-control"></select></div>
+          <div class="form-group"><label><i class="fas fa-dollar-sign"></i> Valor (R$)</label><input type="number" id="dizimoValor" class="form-control" step="0.01" inputmode="decimal"></div>
+        </div>
+        <div style="text-align:right"><button class="btn btn-success" onclick="registrarDizimo()"><i class="fas fa-save"></i> Registrar</button></div>
+      </div>
+      <div class="content-card">
+        <h3><i class="fas fa-list"></i> Dizimistas</h3>
+        <div class="table-container"><table><thead><tr><th>ID</th><th>Nome</th><th>WhatsApp</th><th>Ministério</th><th>Último Dízimo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDizimistas"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div id="pageFinanceiro" class="page">
+      <div class="finance-stats">
+        <div class="finance-stat-card entradas">
+          <div class="info"><div class="value" id="totalEntradasCard">R$ 0,00</div><div class="label">Entradas</div></div>
+          <i class="fas fa-arrow-up"></i>
+        </div>
+        <div class="finance-stat-card saidas">
+          <div class="info"><div class="value" id="totalSaidasCard">R$ 0,00</div><div class="label">Saídas</div></div>
+          <i class="fas fa-arrow-down"></i>
+        </div>
+        <div class="finance-stat-card saldo">
+          <div class="info"><div class="value" id="saldoCard">R$ 0,00</div><div class="label">Saldo</div></div>
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+      </div>
+      <div class="content-card">
+        <div class="tabs">
+          <button class="tab active" onclick="showFinanceiroTab('entrada',this)"><i class="fas fa-arrow-up"></i> Entrada</button>
+          <button class="tab" onclick="showFinanceiroTab('saida',this)"><i class="fas fa-arrow-down"></i> Saída</button>
+          <button class="tab" onclick="showFinanceiroTab('extrato',this)"><i class="fas fa-list"></i> Extrato</button>
+          <button class="tab" onclick="showFinanceiroTab('categorias',this)"><i class="fas fa-tags"></i> Categorias</button>
+        </div>
+        <div id="financeiroEntrada" class="financeiro-tab">
+          <div class="form-grid-small">
+            <div class="form-group"><label><i class="fas fa-calendar"></i> Data</label><input type="date" id="entradaData" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-tag"></i> Categoria</label>
+              <div class="input-group-categoria">
+                <select id="entradaCategoria" class="form-control"></select>
+                <button type="button" class="btn-icon" onclick="abrirModalCategoria('entrada')"><i class="fas fa-plus"></i></button>
+              </div>
+            </div>
+            <div class="form-group"><label><i class="fas fa-user"></i> Membro</label><select id="entradaMembro" class="form-control"><option value="">Selecione...</option></select></div>
+            <div class="form-group"><label><i class="fas fa-dollar-sign"></i> Valor (R$)</label><input type="number" id="entradaValor" class="form-control" step="0.01" inputmode="decimal"></div>
+            <div class="form-group"><label><i class="fas fa-align-left"></i> Descrição</label><input type="text" id="entradaDescricao" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-image"></i> Comprovante</label>
+              <div class="input-group">
+                <button type="button" class="camera-btn" onclick="abrirCamera('entrada')"><i class="fas fa-camera"></i> Foto</button>
+                <button type="button" class="camera-btn" onclick="abrirGaleria('entrada')"><i class="fas fa-images"></i> Galeria</button>
+                <input type="file" id="entradaImagemFile" accept="image/*" style="display:none" onchange="processarImagem('entrada',this)">
+                <span class="file-name" id="entradaFileName">Nenhum</span>
+              </div>
+              <img id="entradaPreview" class="image-preview-small" onclick="abrirImagemModal(this.src)">
+            </div>
+          </div>
+          <div style="text-align:right"><button class="btn btn-success" onclick="registrarEntrada()"><i class="fas fa-save"></i> Registrar</button></div>
+        </div>
+        <div id="financeiroSaida" class="financeiro-tab" style="display:none">
+          <div class="form-grid-small">
+            <div class="form-group"><label><i class="fas fa-calendar"></i> Data</label><input type="date" id="saidaData" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-tag"></i> Categoria</label>
+              <div class="input-group-categoria">
+                <select id="saidaCategoria" class="form-control"></select>
+                <button type="button" class="btn-icon" onclick="abrirModalCategoria('saida')"><i class="fas fa-plus"></i></button>
+              </div>
+            </div>
+            <div class="form-group"><label><i class="fas fa-dollar-sign"></i> Valor (R$)</label><input type="number" id="saidaValor" class="form-control" step="0.01" inputmode="decimal"></div>
+            <div class="form-group"><label><i class="fas fa-align-left"></i> Descrição</label><input type="text" id="saidaDescricao" class="form-control"></div>
+            <div class="form-group"><label><i class="fas fa-image"></i> Comprovante</label>
+              <div class="input-group">
+                <button type="button" class="camera-btn" onclick="abrirCamera('saida')"><i class="fas fa-camera"></i> Foto</button>
+                <button type="button" class="camera-btn" onclick="abrirGaleria('saida')"><i class="fas fa-images"></i> Galeria</button>
+                <input type="file" id="saidaImagemFile" accept="image/*" style="display:none" onchange="processarImagem('saida',this)">
+                <span class="file-name" id="saidaFileName">Nenhum</span>
+              </div>
+              <img id="saidaPreview" class="image-preview-small" onclick="abrirImagemModal(this.src)">
+            </div>
+          </div>
+          <div style="text-align:right"><button class="btn btn-danger" onclick="registrarSaida()"><i class="fas fa-save"></i> Registrar</button></div>
+        </div>
+        <div id="financeiroExtrato" class="financeiro-tab" style="display:none">
+          <div class="filter-row">
+            <div class="filter-group"><label>Data Inicial</label><input type="date" id="extratoDataInicio" class="form-control"></div>
+            <div class="filter-group"><label>Data Final</label><input type="date" id="extratoDataFim" class="form-control"></div>
+            <div class="filter-group"><button class="btn btn-primary" onclick="filtrarExtrato()"><i class="fas fa-filter"></i> Filtrar</button></div>
+            <div class="filter-group"><button class="btn btn-warning" onclick="imprimirExtrato()"><i class="fas fa-print"></i> Imprimir</button></div>
+          </div>
+          <div class="table-container">
+            <table><thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Valor</th><th>Membro</th><th>Comprov.</th></tr></thead><tbody id="tabelaExtrato"></tbody></table>
+          </div>
+          <div style="margin-top:12px; text-align:right; font-weight:bold; font-size:12px" id="extratoTotal"></div>
+        </div>
+        <div id="financeiroCategorias" class="financeiro-tab" style="display:none">
+          <div class="content-card" style="margin-bottom:0; padding:15px;">
+            <h4><i class="fas fa-plus-circle"></i> Nova Categoria</h4>
+            <div class="form-grid-small">
+              <div class="form-group"><label>Nome</label><input type="text" id="novaCategoriaNome" class="form-control" placeholder="Ex: Serviços"></div>
+              <div class="form-group"><label>Tipo</label><select id="novaCategoriaTipo" class="form-control"><option value="entrada">📈 Entrada</option><option value="saida">📉 Saída</option></select></div>
+            </div>
+            <div style="text-align:right"><button class="btn btn-primary" onclick="adicionarCategoriaPersonalizada()"><i class="fas fa-plus"></i> Adicionar</button></div>
+          </div>
+          <div style="margin-top:20px">
+            <h4><i class="fas fa-arrow-up" style="color:#48bb78"></i> Categorias de Entrada</h4>
+            <div class="table-container"><table><thead><tr><th>Categoria</th><th style="width:120px">Ações</th></tr></thead><tbody id="listaCategoriasEntrada"></tbody></table></div>
+            <h4 style="margin-top:20px"><i class="fas fa-arrow-down" style="color:#f56565"></i> Categorias de Saída</h4>
+            <div class="table-container"><table><thead><tr><th>Categoria</th><th style="width:120px">Ações</th></tr></thead><tbody id="listaCategoriasSaida"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENTOS -->
+    <div id="pageEventos" class="page">
+      <div class="content-card">
+        <h3><i class="fas fa-plus-circle"></i> Novo Evento</h3>
+        <div class="form-grid-small">
+          <div class="form-group"><label><i class="fas fa-tag"></i> Nome</label><input type="text" id="eventoNome" class="form-control"></div>
+          <div class="form-group"><label><i class="fas fa-calendar"></i> Data</label><input type="date" id="eventoData" class="form-control"></div>
+          <div class="form-group"><label><i class="fas fa-clock"></i> Horário</label><input type="time" id="eventoHorario" class="form-control"></div>
+          <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Local</label><input type="text" id="eventoLocal" class="form-control"></div>
+          <div class="form-group"><label><i class="fas fa-align-left"></i> Descrição</label><textarea id="eventoDescricao" class="form-control" rows="2"></textarea></div>
+        </div>
+        <div style="text-align:right"><button class="btn btn-success" onclick="salvarEvento()"><i class="fas fa-save"></i> Salvar</button></div>
+      </div>
+      <div class="content-card">
+        <h3><i class="fas fa-list"></i> Eventos</h3>
+        <div class="table-container"><table><thead><tr><th>ID</th><th>Evento</th><th>Data</th><th>Horário</th><th>Local</th><th>Ações</th></tr></thead><tbody id="tabelaEventos"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div id="pageWhatsapp" class="page">
+      <div class="content-card">
+        <h3><i class="fab fa-whatsapp"></i> Enviar Mensagem</h3>
+        <div class="form-group"><label>Tipo</label><select id="tipoComunicado" class="form-control" onchange="atualizarPreviewMensagem()"><option value="evento">📅 Evento</option><option value="aviso">📢 Aviso</option><option value="culto">⛪ Culto</option><option value="dizimo">💰 Dízimo</option><option value="personalizado">✏️ Personalizado</option></select></div>
+        <div class="form-group"><label>Destinatários</label>
+          <div class="grupos-list">
+            <div class="grupo-item"><input type="checkbox" id="grupoTodos" onchange="selecionarTodosContatos(this.checked)"><label>Todos</label></div>
+            <div class="grupo-item"><input type="checkbox" id="grupoDizimistas"><label>💰 Dizimistas</label></div>
+            <div class="grupo-item"><input type="checkbox" id="grupoLouvor"><label>🎵 Louvor</label></div>
+            <div class="grupo-item"><input type="checkbox" id="grupoIntercessao"><label>🙏 Intercessão</label></div>
+          </div>
+        </div>
+        <div class="form-group"><label>Mensagem</label><textarea id="mensagemWhatsapp" class="form-control" rows="4" oninput="atualizarPreviewAoDigitar()"></textarea></div>
+        <div class="preview-message" id="previewMensagem"></div>
+        <div style="margin-top:12px"><button class="btn btn-whatsapp" onclick="enviarWhatsApp()"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button></div>
+      </div>
+      <div class="content-card">
+        <h3><i class="fas fa-address-book"></i> Contatos</h3>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="buscarContato" placeholder="Buscar contato..." onkeyup="filtrarContatos()"></div>
+        <div class="grupos-list" id="listaContatos"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="pageAdmin" class="page">
+      <div class="content-card">
+        <h3><i class="fas fa-user-plus"></i> Novo Usuário</h3>
+        <div class="form-grid-small">
+          <div class="form-group"><label>Nome</label><input type="text" id="novoUsuarioNome" class="form-control"></div>
+          <div class="form-group"><label>E-mail</label><input type="email" id="novoUsuarioEmail" class="form-control"></div>
+          <div class="form-group"><label>WhatsApp</label><input type="tel" id="novoUsuarioWhatsapp" class="form-control"></div>
+          <div class="form-group"><label>Tipo</label><select id="novoUsuarioRole" class="form-control">
+            <option value="tesouraria">💰 Tesouraria</option>
+            <option value="administracao">📋 Administração</option>
+            <option value="pastor">⛪ Pastor</option>
+          </select></div>
+          <div class="form-group"><label>Senha</label><input type="password" id="novoUsuarioSenha" class="form-control"></div>
+          <div class="form-group"><label>Confirmar Senha</label><input type="password" id="novoUsuarioConfirmar" class="form-control"></div>
+        </div>
+        <div style="text-align:right"><button class="btn btn-success" onclick="criarUsuario()"><i class="fas fa-save"></i> Criar</button></div>
+      </div>
+      <div class="content-card">
+        <h3><i class="fas fa-users"></i> Usuários do Sistema</h3>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="buscarUsuario" placeholder="Buscar..." onkeyup="filtrarUsuarios()"></div>
+        <div class="table-container"><table><thead><tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Ações</th></tr></thead><tbody id="tabelaUsuarios"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="editModalTitle">Editar</h3>
+      <button onclick="fecharModal()" style="background:none;border:none;font-size:20px;cursor:pointer">&times;</button>
+    </div>
+    <div id="editModalBody"></div>
+    <div style="margin-top:15px; text-align:right">
+      <button class="btn btn-success" onclick="salvarEdicao()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// PWA - Service Worker & Install Banner
+// ============================================================
+let deferredPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ SW registrado:', reg.scope))
+      .catch(err => console.log('SW erro:', err));
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.classList.add('show');
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+document.getElementById('dismissBtn')?.addEventListener('click', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// ============================================================
+// DADOS
+// ============================================================
+let categoriasEntrada = JSON.parse(localStorage.getItem('categoriasEntrada')) || ["Dízimo","Oferta","Oferta Missionária","Doação"];
+let categoriasSaida = JSON.parse(localStorage.getItem('categoriasSaida')) || ["Água","Luz","Aluguel","Material","Manutenção","Salários"];
+let ministeriosDisponiveis = JSON.parse(localStorage.getItem('ministeriosDisponiveis')) || ["Louvor","Intercessão","Diaconia","Ensino","Evangelismo","Crianças","Jovens"];
+let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [{ id:1, nome:"Administrador", email:"admin@igreja.com", senha:"admin123", whatsapp:"", role:"admin" }];
+let membros = JSON.parse(localStorage.getItem('membros')) || [];
+let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
+let eventos = JSON.parse(localStorage.getItem('eventos')) || [];
+let dizimos = JSON.parse(localStorage.getItem('dizimos')) || [];
+
+let editandoTipo = null, editandoId = null;
+let editandoCategoriaTipo = null, editandoCategoriaIndex = null;
+let usuarioAtual = null;
+let imagemEntrada = "", imagemSaida = "";
+let modalCategoriaTipo = null;
+let streamAtual = null;
+
+function salvarDados() {
+  localStorage.setItem('categoriasEntrada', JSON.stringify(categoriasEntrada));
+  localStorage.setItem('categoriasSaida', JSON.stringify(categoriasSaida));
+  localStorage.setItem('ministeriosDisponiveis', JSON.stringify(ministeriosDisponiveis));
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
+  localStorage.setItem('membros', JSON.stringify(membros));
+  localStorage.setItem('transacoes', JSON.stringify(transacoes));
+  localStorage.setItem('eventos', JSON.stringify(eventos));
+  localStorage.setItem('dizimos', JSON.stringify(dizimos));
+}
+
+function carregarDados() {
+  const loads = ['categoriasEntrada','categoriasSaida','ministeriosDisponiveis','usuarios','membros','transacoes','eventos','dizimos'];
+  loads.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v) eval(k + ' = JSON.parse(v)');
+  });
+  if (!usuarios.find(u => u.email === "admin@igreja.com")) {
+    usuarios.unshift({ id:1, nome:"Administrador", email:"admin@igreja.com", senha:"admin123", whatsapp:"", role:"admin" });
+    salvarDados();
+  }
+}
+
+// ============================================================
+// CATEGORIAS
+// ============================================================
+function carregarSelectCategorias() {
+  ['entradaCategoria','saidaCategoria'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    (i === 0 ? categoriasEntrada : categoriasSaida).forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = cat;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function carregarListaCategorias() {
+  [['listaCategoriasEntrada', categoriasEntrada, 'entrada'], ['listaCategoriasSaida', categoriasSaida, 'saida']].forEach(([id, lista, tipo]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    lista.forEach((cat, idx) => {
+      const row = el.insertRow();
+      row.insertCell(0).innerHTML = cat;
+      row.insertCell(1).innerHTML = `
+        <button class="btn btn-sm btn-warning" onclick="abrirEditarCategoria('${tipo}',${idx},'${cat.replace(/'/g,"\\'")}')" style="margin-right:4px"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="excluirCategoria('${tipo}',${idx})"><i class="fas fa-trash"></i></button>`;
+    });
+  });
+}
+
+function abrirEditarCategoria(tipo, index, nomeAtual) {
+  editandoCategoriaTipo = tipo;
+  editandoCategoriaIndex = index;
+  document.getElementById('editModalTitle').innerHTML = '<i class="fas fa-tag"></i> Editar Categoria';
+  document.getElementById('editModalBody').innerHTML = `<div class="form-group"><label>Nome</label><input type="text" id="editCategoriaNome" class="form-control" value="${nomeAtual}"></div>`;
+  document.getElementById('editModal').classList.add('active');
+  window._editandoCategoria = true;
+}
+
+function adicionarCategoriaPersonalizada() {
+  const nome = document.getElementById('novaCategoriaNome').value.trim();
+  const tipo = document.getElementById('novaCategoriaTipo').value;
+  if (!nome) { alert('Digite o nome!'); return; }
+  const lista = tipo === 'entrada' ? categoriasEntrada : categoriasSaida;
+  if (lista.includes(nome)) { alert('Já existe!'); return; }
+  lista.push(nome);
+  salvarDados(); carregarSelectCategorias(); carregarListaCategorias();
+  document.getElementById('novaCategoriaNome').value = '';
+  alert(`✅ Categoria "${nome}" adicionada!`);
+}
+
+function excluirCategoria(tipo, index) {
+  const padrao = tipo === 'entrada' ? ["Dízimo","Oferta","Oferta Missionária","Doação"] : ["Água","Luz","Aluguel","Material","Manutenção","Salários"];
+  const lista = tipo === 'entrada' ? categoriasEntrada : categoriasSaida;
+  if (padrao.includes(lista[index])) { alert('Não é possível excluir categorias padrão!'); return; }
+  if (confirm(`Excluir "${lista[index]}"?`)) {
+    lista.splice(index, 1);
+    salvarDados(); carregarSelectCategorias(); carregarListaCategorias();
+  }
+}
+
+function abrirModalCategoria(tipo) {
+  modalCategoriaTipo = tipo;
+  document.getElementById('categoriaModalBody').innerHTML = `<div class="form-group"><label>Nova Categoria (${tipo === 'entrada' ? 'Entrada' : 'Saída'})</label><input type="text" id="novaCategoriaModalNome" class="form-control" placeholder="Ex: Nova Categoria"></div>`;
+  document.getElementById('categoriaModal').classList.add('active');
+}
+
+function fecharCategoriaModal() {
+  document.getElementById('categoriaModal').classList.remove('active');
+  modalCategoriaTipo = null;
+}
+
+function salvarNovaCategoria() {
+  const nome = document.getElementById('novaCategoriaModalNome').value.trim();
+  if (!nome) { alert('Digite o nome!'); return; }
+  const lista = modalCategoriaTipo === 'entrada' ? categoriasEntrada : categoriasSaida;
+  if (lista.includes(nome)) { alert('Já existe!'); return; }
+  lista.push(nome);
+  salvarDados(); carregarSelectCategorias(); carregarListaCategorias(); fecharCategoriaModal();
+  alert(`✅ Categoria "${nome}" adicionada!`);
+}
+
+// ============================================================
+// CÂMERA & GALERIA
+// ============================================================
+let modalCamera = null;
+
+function abrirCamera(tipo) {
+  if (modalCamera) modalCamera.remove();
+  modalCamera = document.createElement('div');
+  modalCamera.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:10000;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:15px';
+  const video = document.createElement('video');
+  video.style.cssText = 'max-width:95%;max-height:65vh;border-radius:16px';
+  video.autoplay = true; video.playsinline = true;
+  const canvas = document.createElement('canvas');
+  canvas.style.display = 'none';
+  const btnCapturar = document.createElement('button');
+  btnCapturar.innerHTML = '<i class="fas fa-camera"></i> Capturar';
+  btnCapturar.style.cssText = 'padding:12px 30px;background:#a8edea;border:none;border-radius:50px;color:#4a5568;font-weight:bold;cursor:pointer;font-size:15px';
+  const btnFechar = document.createElement('button');
+  btnFechar.innerHTML = '<i class="fas fa-times"></i> Cancelar';
+  btnFechar.style.cssText = 'padding:10px 25px;background:#fed7d7;border:none;border-radius:50px;color:#c53030;cursor:pointer;font-size:14px';
+  modalCamera.append(video, canvas, btnCapturar, btnFechar);
+  document.body.appendChild(modalCamera);
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => { streamAtual = stream; video.srcObject = stream; })
+    .catch(() => navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { streamAtual = stream; video.srcObject = stream; })
+      .catch(err => { alert('Câmera indisponível: ' + err.message); fecharCamera(); }));
+  btnCapturar.onclick = () => {
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const img = canvas.toDataURL('image/jpeg', 0.8);
+    if (tipo === 'entrada') {
+      imagemEntrada = img;
+      document.getElementById('entradaPreview').src = img;
+      document.getElementById('entradaPreview').classList.add('active');
+      document.getElementById('entradaFileName').textContent = 'Foto capturada';
+    } else {
+      imagemSaida = img;
+      document.getElementById('saidaPreview').src = img;
+      document.getElementById('saidaPreview').classList.add('active');
+      document.getElementById('saidaFileName').textContent = 'Foto capturada';
+    }
+    fecharCamera();
+  };
+  btnFechar.onclick = fecharCamera;
+}
+
+function fecharCamera() {
+  if (streamAtual) { streamAtual.getTracks().forEach(t => t.stop()); streamAtual = null; }
+  if (modalCamera) { modalCamera.remove(); modalCamera = null; }
+}
+
+function abrirGaleria(tipo) {
+  document.getElementById(tipo === 'entrada' ? 'entradaImagemFile' : 'saidaImagemFile').click();
+}
+
+function processarImagem(tipo, input) {
+  if (!input.files?.[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = e.target.result;
+    if (tipo === 'entrada') {
+      imagemEntrada = img;
+      document.getElementById('entradaPreview').src = img;
+      document.getElementById('entradaPreview').classList.add('active');
+      document.getElementById('entradaFileName').textContent = input.files[0].name;
+    } else {
+      imagemSaida = img;
+      document.getElementById('saidaPreview').src = img;
+      document.getElementById('saidaPreview').classList.add('active');
+      document.getElementById('saidaFileName').textContent = input.files[0].name;
+    }
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function abrirImagemModal(src) {
+  if (src) { document.getElementById('modalImage').src = src; document.getElementById('imageModal').classList.add('active'); }
+}
+function fecharImageModal() { document.getElementById('imageModal').classList.remove('active'); }
+
+// ============================================================
+// MINISTÉRIOS
+// ============================================================
+function carregarSelectMinisterios() {
+  const sel = document.getElementById('membroMinisterio');
+  if (!sel) return;
+  sel.innerHTML = '';
+  ministeriosDisponiveis.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = m;
+    sel.appendChild(opt);
+  });
+}
+
+function carregarListaMinisterios() {
+  const c = document.getElementById('listaMinisteriosContainer');
+  if (!c) return;
+  if (!ministeriosDisponiveis.length) { c.innerHTML = '<div class="empty-state">Nenhum ministério</div>'; return; }
+  c.innerHTML = ministeriosDisponiveis.map(m => `<div class="ministerio-tag"><i class="fas fa-church"></i> ${m}</div>`).join('');
+}
+
+function adicionarMinisterio() {
+  const novo = document.getElementById('novoMinisterioNome').value.trim();
+  if (!novo) { alert('Digite o nome!'); return; }
+  if (ministeriosDisponiveis.includes(novo)) { alert('Já existe!'); return; }
+  ministeriosDisponiveis.push(novo);
+  salvarDados(); carregarSelectMinisterios(); carregarListaMinisterios();
+  document.getElementById('novoMinisterioNome').value = '';
+  alert('✅ Ministério adicionado!');
+}
+
+// ============================================================
+// PERMISSÕES
+// ============================================================
+function getPermissoes(role) {
+  return {
+    admin: { dashboard:true, membros:true, dizimistas:true, financeiro:true, eventos:true, whatsapp:true, admin:true, showSaldo:true },
+    tesouraria: { dashboard:true, membros:false, dizimistas:true, financeiro:true, eventos:false, whatsapp:true, admin:false, showSaldo:true },
+    administracao: { dashboard:true, membros:true, dizimistas:false, financeiro:false, eventos:true, whatsapp:true, admin:false, showSaldo:false },
+    pastor: { dashboard:true, membros:true, dizimistas:false, financeiro:false, eventos:true, whatsapp:false, admin:false, showSaldo:false }
+  }[role] || { dashboard:true };
+}
+
+function gerarMenu(p) {
+  const items = [
+    { id:'dashboard', icon:'fa-chart-pie', label:'Dashboard', v:p.dashboard },
+    { id:'membros', icon:'fa-users', label:'Membros', v:p.membros },
+    { id:'dizimistas', icon:'fa-hand-holding-usd', label:'Dizimistas', v:p.dizimistas },
+    { id:'financeiro', icon:'fa-coins', label:'Financeiro', v:p.financeiro },
+    { id:'eventos', icon:'fa-calendar-alt', label:'Eventos', v:p.eventos },
+    { id:'whatsapp', icon:'fab fa-whatsapp', label:'WhatsApp', v:p.whatsapp }
+  ];
+  if (p.admin) items.push({ id:'admin', icon:'fa-user-shield', label:'Usuários', v:true });
+  const nav = document.getElementById('navMenu');
+  nav.innerHTML = '';
+  items.filter(i => i.v).forEach(i => {
+    const div = document.createElement('div');
+    div.className = 'nav-item';
+    div.onclick = () => showPage(i.id);
+    div.innerHTML = `<i class="fas ${i.icon}"></i><span>${i.label}</span>`;
+    nav.appendChild(div);
+  });
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function fazerLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const usuario = usuarios.find(u => u.email === email && u.senha === senha);
+  const err = document.getElementById('loginError');
+  if (usuario) {
+    usuarioAtual = usuario;
+    sessionStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('userName').textContent = usuario.nome;
+    document.getElementById('userAvatar').textContent = usuario.nome.charAt(0).toUpperCase();
+    const roles = { admin:'Administrador', tesouraria:'Tesouraria', administracao:'Administração', pastor:'Pastor' };
+    document.getElementById('userRole').textContent = roles[usuario.role] || 'Usuário';
+    const p = getPermissoes(usuario.role);
+    gerarMenu(p);
+    inicializarApp(p);
+  } else {
+    err.style.display = 'block';
+    err.innerHTML = '<i class="fas fa-exclamation-circle"></i> E-mail ou senha incorretos!';
+  }
+}
+
+function inicializarApp(p) {
+  if (p.dashboard) showPage('dashboard');
+  else if (p.financeiro) showPage('financeiro');
+  else if (p.membros) showPage('membros');
+  carregarDashboard(p);
+  carregarMembrosSelect(); carregarListaMembros();
+  carregarDizimistas(); carregarFinanceiro();
+  atualizarSaldoCard(); carregarExtrato();
+  carregarEventos(); carregarContatos();
+  carregarDizimoSelect(); carregarUsuarios();
+}
+
+function logout() {
+  sessionStorage.removeItem('usuarioLogado');
+  usuarioAtual = null;
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginSenha').value = '';
+}
+
+// ============================================================
+// NAVEGAÇÃO
+// ============================================================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (pageEl) pageEl.classList.add('active');
+  const titles = { dashboard:'Dashboard', membros:'Membros', dizimistas:'Dizimistas', financeiro:'Financeiro', eventos:'Eventos', whatsapp:'WhatsApp', admin:'Usuários' };
+  const icons = { dashboard:'fa-chart-pie', membros:'fa-users', dizimistas:'fa-hand-holding-usd', financeiro:'fa-coins', eventos:'fa-calendar-alt', whatsapp:'fa-whatsapp', admin:'fa-user-shield' };
+  document.getElementById('pageTitle').innerHTML = `<i class="fas ${icons[page] || 'fa-circle'}"></i> ${titles[page] || page}`;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const loads = {
+    dashboard: () => carregarDashboard(getPermissoes(usuarioAtual?.role)),
+    membros: () => { carregarListaMembros(); carregarSelectMinisterios(); carregarListaMinisterios(); },
+    dizimistas: () => { carregarDizimistas(); carregarDizimoSelect(); },
+    financeiro: () => { carregarFinanceiro(); atualizarSaldoCard(); carregarExtrato(); carregarSelectCategorias(); carregarListaCategorias(); },
+    eventos: () => carregarEventos(),
+    whatsapp: () => carregarContatos(),
+    admin: () => carregarUsuarios()
+  };
+  if (loads[page]) loads[page]();
+  fecharMenu();
+}
+
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function fecharMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function setTab(container, btn) {
+  container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function showMembrosTab(tab, btn) {
+  document.getElementById('membrosCadastro').style.display = tab === 'cadastro' ? 'block' : 'none';
+  document.getElementById('membrosLista').style.display = tab === 'lista' ? 'block' : 'none';
+  document.getElementById('membrosMinisterios').style.display = tab === 'ministerios' ? 'block' : 'none';
+  if (btn) setTab(btn.closest('.tabs'), btn);
+  if (tab === 'ministerios') carregarListaMinisterios();
+  if (tab === 'lista') carregarListaMembros();
+}
+
+function showFinanceiroTab(tab, btn) {
+  ['financeiroEntrada','financeiroSaida','financeiroExtrato','financeiroCategorias'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('financeiro' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+  if (btn) setTab(btn.closest('.tabs'), btn);
+  if (tab === 'extrato') carregarExtrato();
+  if (tab === 'categorias') { carregarSelectCategorias(); carregarListaCategorias(); }
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function carregarDashboard(permissoes = null) {
+  const totalMembros = membros.length;
+  const ativos = membros.filter(m => m.status === 'Ativo').length;
+  const dizimistasCount = membros.filter(m => m.dizimista === 'Sim').length;
+  const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((s, t) => s + t.valor, 0);
+  const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((s, t) => s + t.valor, 0);
+  const saldo = entradas - saidas;
+  const hoje = new Date().toISOString().split('T')[0];
+  const eventosHoje = eventos.filter(e => e.data === hoje).length;
+  const showSaldo = permissoes?.showSaldo ?? true;
+
+  let html = `
+    <div class="stat-card"><div><div class="value">${totalMembros}</div><div class="label">Membros</div></div><i class="fas fa-users"></i></div>
+    <div class="stat-card"><div><div class="value">${ativos}</div><div class="label">Ativos</div></div><i class="fas fa-user-check"></i></div>
+    <div class="stat-card"><div><div class="value">${dizimistasCount}</div><div class="label">Dizimistas</div></div><i class="fas fa-hand-holding-usd"></i></div>`;
+  if (showSaldo) html += `<div class="stat-card"><div><div class="value">R$ ${saldo.toFixed(2)}</div><div class="label">Saldo</div></div><i class="fas fa-dollar-sign"></i></div>`;
+  html += `<div class="stat-card"><div><div class="value">${eventosHoje}</div><div class="label">Eventos Hoje</div></div><i class="fas fa-calendar-day"></i></div>`;
+  document.getElementById('dashboardStats').innerHTML = html;
+
+  // Gráfico 30 dias
+  const labels = [], entradasD = [], saidasD = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    labels.push(ds.substring(5));
+    entradasD.push(transacoes.filter(t => t.tipo === 'entrada' && t.data === ds).reduce((s, t) => s + t.valor, 0));
+    saidasD.push(transacoes.filter(t => t.tipo === 'saida' && t.data === ds).reduce((s, t) => s + t.valor, 0));
+  }
+  const ctx1 = document.getElementById('financasChart')?.getContext('2d');
+  if (ctx1) {
+    if (window.financasChartInstance) window.financasChartInstance.destroy();
+    window.financasChartInstance = new Chart(ctx1, {
+      type: 'line',
+      data: { labels, datasets: [
+        { label:'Entradas', data:entradasD, borderColor:'#48bb78', backgroundColor:'rgba(72,187,120,0.1)', fill:true, tension:0.4 },
+        { label:'Saídas', data:saidasD, borderColor:'#f56565', backgroundColor:'rgba(245,101,101,0.1)', fill:true, tension:0.4 }
+      ]},
+      options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'top' } } }
+    });
+  }
+
+  const mCount = {};
+  ministeriosDisponiveis.forEach(m => mCount[m] = 0);
+  membros.forEach(m => { if (mCount[m.ministerio] !== undefined) mCount[m.ministerio]++; });
+  const ctx2 = document.getElementById('ministeriosChart')?.getContext('2d');
+  if (ctx2) {
+    if (window.ministeriosChartInstance) window.ministeriosChartInstance.destroy();
+    window.ministeriosChartInstance = new Chart(ctx2, {
+      type: 'bar',
+      data: { labels: Object.keys(mCount), datasets: [{ label:'Membros', data: Object.values(mCount), backgroundColor:'#a8edea' }] },
+      options: { responsive:true, maintainAspectRatio:true, scales:{ y:{ beginAtZero:true } } }
+    });
+  }
+
+  const proximos = eventos.filter(e => e.data >= hoje).sort((a,b) => a.data.localeCompare(b.data)).slice(0,5);
+  document.getElementById('proximosEventos').innerHTML = proximos.length
+    ? proximos.map(e => `<div style="padding:10px;border-bottom:1px solid #f0f2f5"><strong>${e.nome}</strong><br>📅 ${new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR')} ${e.horario || ''}</div>`).join('')
+    : '<div class="empty-state"><i class="fas fa-calendar-times"></i><br>Nenhum evento próximo</div>';
+}
+
+// ============================================================
+// MEMBROS
+// ============================================================
+function salvarMembro() {
+  const novo = {
+    id: Date.now(),
+    nome: document.getElementById('membroNome').value.trim(),
+    dataNasc: document.getElementById('membroDataNasc').value,
+    sexo: document.getElementById('membroSexo').value,
+    cpf: document.getElementById('membroCpf').value,
+    email: document.getElementById('membroEmail').value,
+    whatsapp: document.getElementById('membroWhatsapp').value.trim(),
+    endereco: document.getElementById('membroEndereco').value,
+    bairro: document.getElementById('membroBairro').value,
+    ministerio: document.getElementById('membroMinisterio').value,
+    status: document.getElementById('membroStatus').value,
+    dizimista: document.getElementById('membroDizimista').value
+  };
+  if (!novo.nome || !novo.whatsapp) { alert('Preencha Nome e WhatsApp!'); return; }
+  membros.push(novo);
+  salvarDados();
+  alert('✅ Membro cadastrado!');
+  ['membroNome','membroWhatsapp','membroCpf','membroEmail','membroEndereco','membroBairro'].forEach(id => document.getElementById(id).value = '');
+  carregarListaMembros(); carregarMembrosSelect(); carregarDizimistas(); carregarDizimoSelect();
+  showMembrosTab('lista', document.querySelectorAll('#pageMembros .tab')[1]);
+}
+
+function carregarListaMembros() {
+  const tbody = document.getElementById('tabelaMembros');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!membros.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum membro cadastrado</td></tr>'; return; }
+  membros.forEach(m => {
+    const row = tbody.insertRow();
+    row.insertCell(0).innerHTML = m.id;
+    row.insertCell(1).innerHTML = m.nome;
+    row.insertCell(2).innerHTML = m.whatsapp || '-';
+    row.insertCell(3).innerHTML = m.ministerio || '-';
+    row.insertCell(4).innerHTML = m.dizimista === 'Sim' ? '<span style="color:#48bb78">✓ Sim</span>' : 'Não';
+    row.insertCell(5).innerHTML = `<span class="status-${m.status === 'Ativo' ? 'ativo' : 'inativo'}">${m.status}</span>`;
+    row.insertCell(6).innerHTML = `<button class="btn btn-sm btn-primary" onclick="abrirEditarMembro(${m.id})" style="margin-right:4px"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="excluirMembro(${m.id})"><i class="fas fa-trash"></i></button>`;
+  });
+}
+
+function abrirEditarMembro(id) {
+  const m = membros.find(m => m.id === id);
+  if (!m) return;
+  editandoTipo = 'membro'; editandoId = id;
+  window._editandoCategoria = false;
+  document.getElementById('editModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Editar Membro';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-group"><label>Nome</label><input type="text" id="editNome" class="form-control" value="${m.nome.replace(/"/g,'&quot;')}"></div>
+    <div class="form-group"><label>WhatsApp</label><input type="tel" id="editWhatsapp" class="form-control" value="${m.whatsapp||''}"></div>
+    <div class="form-group"><label>Ministério</label><select id="editMinisterio" class="form-control">${ministeriosDisponiveis.map(mo => `<option ${m.ministerio===mo?'selected':''}>${mo}</option>`).join('')}</select></div>
+    <div class="form-group"><label>Status</label><select id="editStatus" class="form-control"><option ${m.status==='Ativo'?'selected':''}>Ativo</option><option ${m.status==='Inativo'?'selected':''}>Inativo</option><option ${m.status==='Transferido'?'selected':''}>Transferido</option></select></div>
+    <div class="form-group"><label>Dizimista</label><select id="editDizimista" class="form-control"><option ${m.dizimista==='Sim'?'selected':''}>Sim</option><option ${m.dizimista==='Não'?'selected':''}>Não</option></select></div>`;
+  document.getElementById('editModal').classList.add('active');
+}
+
+function excluirMembro(id) {
+  if (confirm('Excluir este membro?')) {
+    membros = membros.filter(m => m.id !== id);
+    salvarDados(); carregarListaMembros(); carregarMembrosSelect(); carregarDizimistas(); carregarDizimoSelect();
+  }
+}
+
+function filtrarMembros() {
+  const f = document.getElementById('buscarMembro')?.value.toLowerCase();
+  document.querySelectorAll('#tabelaMembros tr').forEach(r => r.style.display = !f || r.textContent.toLowerCase().includes(f) ? '' : 'none');
+}
+
+// ============================================================
+// DIZIMISTAS
+// ============================================================
+function carregarDizimistas() {
+  const lista = membros.filter(m => m.dizimista === 'Sim');
+  const total = dizimos.reduce((s, d) => s + d.valor, 0);
+  document.getElementById('dizimistasStats').innerHTML = `
+    <div class="stat-card"><div><div class="value">${lista.length}</div><div class="label">Dizimistas</div></div><i class="fas fa-hand-holding-usd"></i></div>
+    <div class="stat-card"><div><div class="value">R$ ${total.toFixed(2)}</div><div class="label">Total Arrecadado</div></div><i class="fas fa-dollar-sign"></i></div>`;
+  const tbody = document.getElementById('tabelaDizimistas');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum dizimista</td></tr>'; return; }
+  lista.forEach(d => {
+    const ultimo = dizimos.filter(dz => dz.membroId == d.id).sort((a,b) => b.data.localeCompare(a.data))[0];
+    const row = tbody.insertRow();
+    row.insertCell(0).innerHTML = d.id;
+    row.insertCell(1).innerHTML = d.nome;
+    row.insertCell(2).innerHTML = d.whatsapp || '-';
+    row.insertCell(3).innerHTML = d.ministerio || '-';
+    row.insertCell(4).innerHTML = ultimo ? `R$ ${ultimo.valor.toFixed(2)}` : '-';
+    row.insertCell(5).innerHTML = `<span class="status-${d.status==='Ativo'?'ativo':'inativo'}">${d.status}</span>`;
+    row.insertCell(6).innerHTML = `<button class="btn btn-sm btn-primary" onclick="abrirEditarMembro(${d.id})"><i class="fas fa-edit"></i></button>`;
+  });
+}
+
+function carregarDizimoSelect() {
+  const sel = document.getElementById('dizimoMembro');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione...</option>';
+  membros.filter(m => m.dizimista === 'Sim').forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id; opt.textContent = m.nome;
+    sel.appendChild(opt);
+  });
+}
+
+function registrarDizimo() {
+  const data = document.getElementById('dizimoData').value || new Date().toISOString().split('T')[0];
+  const membroId = document.getElementById('dizimoMembro').value;
+  const valor = parseFloat(document.getElementById('dizimoValor').value);
+  if (!membroId || !valor || valor <= 0) { alert('Selecione o membro e informe o valor!'); return; }
+  dizimos.push({ membroId, data, valor });
+  transacoes.push({ id: Date.now(), data, tipo:'entrada', categoria:'Dízimo', membroId, valor, descricao:'Dízimo', imagem:'' });
+  salvarDados();
+  alert('✅ Dízimo registrado!');
+  document.getElementById('dizimoValor').value = '';
+  carregarDizimistas(); carregarFinanceiro(); atualizarSaldoCard(); carregarExtrato();
+}
+
+// ============================================================
+// FINANCEIRO
+// ============================================================
+function carregarMembrosSelect() {
+  const sel = document.getElementById('entradaMembro');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione...</option>';
+  membros.filter(m => m.dizimista === 'Sim').forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id; opt.textContent = m.nome;
+    sel.appendChild(opt);
+  });
+}
+
+function carregarFinanceiro() {
+  const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((s, t) => s + t.valor, 0);
+  const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((s, t) => s + t.valor, 0);
+  document.getElementById('totalEntradasCard').textContent = `R$ ${entradas.toFixed(2)}`;
+  document.getElementById('totalSaidasCard').textContent = `R$ ${saidas.toFixed(2)}`;
+  atualizarSaldoCard();
+}
+
+function atualizarSaldoCard() {
+  const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((s, t) => s + t.valor, 0);
+  const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((s, t) => s + t.valor, 0);
+  const saldo = entradas - saidas;
+  const el = document.getElementById('saldoCard');
+  if (el) { el.textContent = `R$ ${saldo.toFixed(2)}`; el.className = `value ${saldo >= 0 ? 'positive' : 'negative'}`; }
+}
+
+function registrarEntrada() {
+  const transacao = {
+    id: Date.now(), tipo:'entrada',
+    data: document.getElementById('entradaData').value || new Date().toISOString().split('T')[0],
+    categoria: document.getElementById('entradaCategoria').value,
+    membroId: document.getElementById('entradaMembro').value,
+    valor: parseFloat(document.getElementById('entradaValor').value),
+    descricao: document.getElementById('entradaDescricao').value,
+    imagem: imagemEntrada || ''
+  };
+  if (!transacao.valor || transacao.valor <= 0) { alert('Informe o valor!'); return; }
+  transacoes.push(transacao);
+  if (transacao.categoria === 'Dízimo' && transacao.membroId) dizimos.push({ membroId: parseInt(transacao.membroId), data: transacao.data, valor: transacao.valor });
+  salvarDados();
+  alert('✅ Entrada registrada!');
+  document.getElementById('entradaValor').value = '';
+  document.getElementById('entradaDescricao').value = '';
+  document.getElementById('entradaImagemFile').value = '';
+  document.getElementById('entradaPreview').classList.remove('active');
+  document.getElementById('entradaFileName').textContent = 'Nenhum';
+  imagemEntrada = '';
+  carregarFinanceiro(); atualizarSaldoCard(); carregarExtrato(); carregarDizimistas();
+}
+
+function registrarSaida() {
+  const transacao = {
+    id: Date.now(), tipo:'saida',
+    data: document.getElementById('saidaData').value || new Date().toISOString().split('T')[0],
+    categoria: document.getElementById('saidaCategoria').value,
+    valor: parseFloat(document.getElementById('saidaValor').value),
+    descricao: document.getElementById('saidaDescricao').value,
+    imagem: imagemSaida || ''
+  };
+  if (!transacao.valor || transacao.valor <= 0) { alert('Informe o valor!'); return; }
+  transacoes.push(transacao);
+  salvarDados();
+  alert('✅ Saída registrada!');
+  document.getElementById('saidaValor').value = '';
+  document.getElementById('saidaDescricao').value = '';
+  document.getElementById('saidaImagemFile').value = '';
+  document.getElementById('saidaPreview').classList.remove('active');
+  document.getElementById('saidaFileName').textContent = 'Nenhum';
+  imagemSaida = '';
+  carregarFinanceiro(); atualizarSaldoCard(); carregarExtrato();
+}
+
+function filtrarExtrato() {
+  const inicio = document.getElementById('extratoDataInicio').value;
+  const fim = document.getElementById('extratoDataFim').value;
+  let f = [...transacoes];
+  if (inicio) f = f.filter(t => t.data >= inicio);
+  if (fim) f = f.filter(t => t.data <= fim);
+  carregarExtrato(f);
+}
+
+function carregarExtrato(lista = null) {
+  const dados = lista ?? transacoes;
+  const tbody = document.getElementById('tabelaExtrato');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  let e = 0, s = 0;
+  if (!dados.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhuma transação</td></tr>';
+    document.getElementById('extratoTotal').innerHTML = '<strong>Total: R$ 0,00</strong>';
+    return;
+  }
+  [...dados].sort((a,b) => b.data.localeCompare(a.data)).forEach(t => {
+    const membro = membros.find(m => m.id == t.membroId);
+    const row = tbody.insertRow();
+    row.insertCell(0).innerHTML = new Date(t.data + 'T12:00:00').toLocaleDateString('pt-BR');
+    row.insertCell(1).innerHTML = t.tipo === 'entrada' ? '<span style="color:#48bb78">Entrada</span>' : '<span style="color:#f56565">Saída</span>';
+    row.insertCell(2).innerHTML = t.categoria || '-';
+    row.insertCell(3).innerHTML = t.descricao || '-';
+    row.insertCell(4).innerHTML = t.tipo === 'entrada' ? `<span style="color:#48bb78">+ R$ ${t.valor.toFixed(2)}</span>` : `<span style="color:#f56565">- R$ ${t.valor.toFixed(2)}</span>`;
+    row.insertCell(5).innerHTML = membro?.nome || '-';
+    row.insertCell(6).innerHTML = t.imagem ? `<img src="${t.imagem}" class="table-img" onclick="abrirImagemModal('${t.imagem}')">` : '-';
+    if (t.tipo === 'entrada') e += t.valor; else s += t.valor;
+  });
+  document.getElementById('extratoTotal').innerHTML = `<strong>Entradas: R$ ${e.toFixed(2)} | Saídas: R$ ${s.toFixed(2)} | Saldo: <span style="color:${(e-s)>=0?'#48bb78':'#f56565'}">R$ ${(e-s).toFixed(2)}</span></strong>`;
+}
+
+function imprimirExtrato() {
+  const inicio = document.getElementById('extratoDataInicio').value;
+  const fim = document.getElementById('extratoDataFim').value;
+  let f = [...transacoes];
+  if (inicio) f = f.filter(t => t.data >= inicio);
+  if (fim) f = f.filter(t => t.data <= fim);
+  const win = window.open();
+  win.document.write(`<html><head><title>Extrato Financeiro</title>
+    <style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background:#f5f5f5}h2{color:#2c3e50}</style>
+    </head><body><h2>⛪ Igreja AD - Extrato Financeiro</h2><p>Período: ${inicio||'Início'} a ${fim||'Hoje'}</p>
+    <table><thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Valor</th></tr></thead><tbody>
+    ${f.map(t => `<tr><td>${new Date(t.data+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>${t.tipo}</td><td>${t.categoria||'-'}</td><td>${t.descricao||'-'}</td><td>R$ ${t.valor.toFixed(2)}</td></tr>`).join('')}
+    </tbody></table></body></html>`);
+  win.print();
+}
+
+// ============================================================
+// EVENTOS
+// ============================================================
+function salvarEvento() {
+  const novo = {
+    id: Date.now(),
+    nome: document.getElementById('eventoNome').value.trim(),
+    data: document.getElementById('eventoData').value,
+    horario: document.getElementById('eventoHorario').value,
+    local: document.getElementById('eventoLocal').value,
+    descricao: document.getElementById('eventoDescricao').value
+  };
+  if (!novo.nome || !novo.data) { alert('Preencha nome e data!'); return; }
+  eventos.push(novo);
+  salvarDados();
+  alert('✅ Evento cadastrado!');
+  document.getElementById('eventoNome').value = '';
+  carregarEventos();
+}
+
+function carregarEventos() {
+  const tbody = document.getElementById('tabelaEventos');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!eventos.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum evento</td></tr>'; return; }
+  [...eventos].sort((a,b) => a.data.localeCompare(b.data)).forEach(e => {
+    const row = tbody.insertRow();
+    row.insertCell(0).innerHTML = e.id;
+    row.insertCell(1).innerHTML = e.nome;
+    row.insertCell(2).innerHTML = new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR');
+    row.insertCell(3).innerHTML = e.horario || '-';
+    row.insertCell(4).innerHTML = e.local || '-';
+    row.insertCell(5).innerHTML = `<button class="btn btn-sm btn-primary" onclick="abrirEditarEvento(${e.id})" style="margin-right:4px"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="excluirEvento(${e.id})"><i class="fas fa-trash"></i></button>`;
+  });
+}
+
+function abrirEditarEvento(id) {
+  const e = eventos.find(e => e.id === id);
+  if (!e) return;
+  editandoTipo = 'evento'; editandoId = id;
+  window._editandoCategoria = false;
+  document.getElementById('editModalTitle').innerHTML = '<i class="fas fa-calendar-edit"></i> Editar Evento';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-group"><label>Nome</label><input type="text" id="editEventoNome" class="form-control" value="${e.nome}"></div>
+    <div class="form-group"><label>Data</label><input type="date" id="editEventoData" class="form-control" value="${e.data}"></div>
+    <div class="form-group"><label>Horário</label><input type="time" id="editEventoHorario" class="form-control" value="${e.horario||''}"></div>
+    <div class="form-group"><label>Local</label><input type="text" id="editEventoLocal" class="form-control" value="${e.local||''}"></div>`;
+  document.getElementById('editModal').classList.add('active');
+}
+
+function excluirEvento(id) {
+  if (confirm('Excluir este evento?')) {
+    eventos = eventos.filter(e => e.id !== id);
+    salvarDados(); carregarEventos();
+  }
+}
+
+// ============================================================
+// USUÁRIOS
+// ============================================================
+function carregarUsuarios() {
+  const tbody = document.getElementById('tabelaUsuarios');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const roles = { admin:'Admin', tesouraria:'Tesouraria', administracao:'Administração', pastor:'Pastor' };
+  usuarios.forEach(u => {
+    const row = tbody.insertRow();
+    row.insertCell(0).innerHTML = u.id;
+    row.insertCell(1).innerHTML = u.nome;
+    row.insertCell(2).innerHTML = u.email;
+    row.insertCell(3).innerHTML = roles[u.role] || u.role;
+    row.insertCell(4).innerHTML = `<button class="btn btn-sm btn-primary" onclick="abrirEditarUsuario(${u.id})" style="margin-right:4px"><i class="fas fa-edit"></i></button>${u.id !== 1 ? `<button class="btn btn-sm btn-danger" onclick="excluirUsuario(${u.id})"><i class="fas fa-trash"></i></button>` : ''}`;
+  });
+}
+
+function criarUsuario() {
+  const nome = document.getElementById('novoUsuarioNome').value.trim();
+  const email = document.getElementById('novoUsuarioEmail').value.trim();
+  const role = document.getElementById('novoUsuarioRole').value;
+  const senha = document.getElementById('novoUsuarioSenha').value;
+  const confirmar = document.getElementById('novoUsuarioConfirmar').value;
+  if (!nome || !email || !senha) { alert('Preencha todos os campos!'); return; }
+  if (senha !== confirmar) { alert('As senhas não conferem!'); return; }
+  if (usuarios.find(u => u.email === email)) { alert('E-mail já cadastrado!'); return; }
+  usuarios.push({ id: Date.now(), nome, email, senha, whatsapp:'', role });
+  salvarDados();
+  alert('✅ Usuário criado!');
+  ['novoUsuarioNome','novoUsuarioEmail','novoUsuarioSenha','novoUsuarioConfirmar'].forEach(id => document.getElementById(id).value = '');
+  carregarUsuarios();
+}
+
+function abrirEditarUsuario(id) {
+  const u = usuarios.find(u => u.id === id);
+  if (!u) return;
+  editandoTipo = 'usuario'; editandoId = id;
+  window._editandoCategoria = false;
+  document.getElementById('editModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Editar Usuário';
+  document.getElementById('editModalBody').innerHTML = `
+    <div class="form-group"><label>Nome</label><input type="text" id="editUsuarioNome" class="form-control" value="${u.nome}"></div>
+    <div class="form-group"><label>E-mail</label><input type="email" id="editUsuarioEmail" class="form-control" value="${u.email}"></div>
+    <div class="form-group"><label>Tipo</label><select id="editUsuarioRole" class="form-control">
+      <option ${u.role==='tesouraria'?'selected':''} value="tesouraria">Tesouraria</option>
+      <option ${u.role==='administracao'?'selected':''} value="administracao">Administração</option>
+      <option ${u.role==='pastor'?'selected':''} value="pastor">Pastor</option>
+      <option ${u.role==='admin'?'selected':''} value="admin">Admin</option>
+    </select></div>
+    <div class="form-group"><label>Nova Senha</label><input type="password" id="editUsuarioSenha" class="form-control" placeholder="Deixe em branco para manter"></div>`;
+  document.getElementById('editModal').classList.add('active');
+}
+
+function excluirUsuario(id) {
+  if (id === 1) { alert('Não é possível excluir o administrador principal!'); return; }
+  if (confirm('Excluir este usuário?')) {
+    usuarios = usuarios.filter(u => u.id !== id);
+    salvarDados(); carregarUsuarios();
+  }
+}
+
+function filtrarUsuarios() {
+  const f = document.getElementById('buscarUsuario')?.value.toLowerCase();
+  document.querySelectorAll('#tabelaUsuarios tr').forEach(r => r.style.display = !f || r.textContent.toLowerCase().includes(f) ? '' : 'none');
+}
+
+// ============================================================
+// SALVAR EDIÇÃO MODAL
+// ============================================================
+function salvarEdicao() {
+  // Edição de categoria
+  if (window._editandoCategoria) {
+    const novoNome = document.getElementById('editCategoriaNome').value.trim();
+    if (!novoNome) { alert('Digite o nome!'); return; }
+    const lista = editandoCategoriaTipo === 'entrada' ? categoriasEntrada : categoriasSaida;
+    if (lista.includes(novoNome) && lista[editandoCategoriaIndex] !== novoNome) { alert('Já existe!'); return; }
+    lista[editandoCategoriaIndex] = novoNome;
+    salvarDados(); carregarSelectCategorias(); carregarListaCategorias();
+    fecharModal(); alert('✅ Categoria atualizada!');
+    return;
+  }
+  if (editandoTipo === 'membro') {
+    const idx = membros.findIndex(m => m.id === editandoId);
+    if (idx !== -1) {
+      membros[idx] = { ...membros[idx], nome: document.getElementById('editNome').value, whatsapp: document.getElementById('editWhatsapp').value, ministerio: document.getElementById('editMinisterio').value, status: document.getElementById('editStatus').value, dizimista: document.getElementById('editDizimista').value };
+      salvarDados(); carregarListaMembros(); carregarMembrosSelect(); carregarDizimistas(); carregarDizimoSelect();
+      alert('✅ Membro atualizado!');
+    }
+  } else if (editandoTipo === 'evento') {
+    const idx = eventos.findIndex(e => e.id === editandoId);
+    if (idx !== -1) {
+      eventos[idx] = { ...eventos[idx], nome: document.getElementById('editEventoNome').value, data: document.getElementById('editEventoData').value, horario: document.getElementById('editEventoHorario').value, local: document.getElementById('editEventoLocal').value };
+      salvarDados(); carregarEventos(); alert('✅ Evento atualizado!');
+    }
+  } else if (editandoTipo === 'usuario') {
+    const idx = usuarios.findIndex(u => u.id === editandoId);
+    if (idx !== -1) {
+      const novaSenha = document.getElementById('editUsuarioSenha').value;
+      usuarios[idx] = { ...usuarios[idx], nome: document.getElementById('editUsuarioNome').value, email: document.getElementById('editUsuarioEmail').value, role: document.getElementById('editUsuarioRole').value, senha: novaSenha || usuarios[idx].senha };
+      salvarDados(); carregarUsuarios();
+      if (usuarioAtual?.id === editandoId) {
+        usuarioAtual = usuarios[idx];
+        sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtual));
+        document.getElementById('userName').textContent = usuarioAtual.nome;
+        const p = getPermissoes(usuarioAtual.role);
+        gerarMenu(p); carregarDashboard(p);
+      }
+      alert('✅ Usuário atualizado!');
+    }
+  }
+  fecharModal();
+}
+
+function fecharModal() {
+  document.getElementById('editModal').classList.remove('active');
+  editandoTipo = null; editandoId = null;
+  editandoCategoriaTipo = null; editandoCategoriaIndex = null;
+  window._editandoCategoria = false;
+}
+
+// ============================================================
+// WHATSAPP
+// ============================================================
+function atualizarPreviewMensagem() {
+  const tipo = document.getElementById('tipoComunicado').value;
+  const msgs = {
+    evento: '📅 *EVENTO ESPECIAL*\n\nOlá! Venha participar do nosso evento!\n\nAguardamos você!\n\n_Igreja AD - Magalhães Bastos_',
+    culto: '⛪ *CULTO HOJE*\n\nOlá! Não perca o culto de hoje às 19h.\n\nVenha adorar!\n\n_Igreja AD - Magalhães Bastos_',
+    dizimo: '💰 *DÍZIMO*\n\nOlá! Agradecemos sua fidelidade ao Senhor!\n\nQue Deus abençoe sua oferta.\n\n_Igreja AD - Magalhães Bastos_',
+    aviso: '📢 *AVISO IMPORTANTE*\n\nOlá!\n\n[Seu aviso aqui]\n\n_Igreja AD - Magalhães Bastos_',
+    personalizado: '✏️ *COMUNICADO*\n\n[Sua mensagem personalizada]\n\n_Igreja AD - Magalhães Bastos_'
+  };
+  const msg = msgs[tipo] || msgs.personalizado;
+  document.getElementById('mensagemWhatsapp').value = msg;
+  document.getElementById('previewMensagem').innerHTML = msg.replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/_(.*?)_/g,'<em>$1</em>');
+}
+
+function atualizarPreviewAoDigitar() {
+  const msg = document.getElementById('mensagemWhatsapp').value;
+  document.getElementById('previewMensagem').innerHTML = msg.replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/_(.*?)_/g,'<em>$1</em>');
+}
+
+function carregarContatos() {
+  const c = document.getElementById('listaContatos');
+  if (!c) return;
+  c.innerHTML = '';
+  const comWhatsApp = membros.filter(m => m.whatsapp && m.whatsapp.length > 9);
+  if (!comWhatsApp.length) { c.innerHTML = '<div class="empty-state">Nenhum contato com WhatsApp</div>'; return; }
+  comWhatsApp.forEach(m => {
+    c.innerHTML += `<div class="grupo-item">
+      <input type="checkbox" id="contato_${m.id}" class="contato-checkbox" data-numero="${m.whatsapp}" data-nome="${m.nome}" data-ministerio="${m.ministerio||''}" data-dizimista="${m.dizimista||'Não'}">
+      <label for="contato_${m.id}"><strong>${m.nome}</strong><br><small>${m.whatsapp} · ${m.ministerio||'-'}</small></label>
+    </div>`;
+  });
+}
+
+function selecionarTodosContatos(sel) {
+  document.querySelectorAll('.contato-checkbox').forEach(cb => cb.checked = sel);
+}
+
+function filtrarContatos() {
+  const b = document.getElementById('buscarContato')?.value.toLowerCase();
+  document.querySelectorAll('#listaContatos .grupo-item').forEach(item => item.style.display = !b || item.textContent.toLowerCase().includes(b) ? '' : 'none');
+}
+
+function getContatosSelecionados() {
+  const grupoDizimistas = document.getElementById('grupoDizimistas')?.checked;
+  const grupoLouvor = document.getElementById('grupoLouvor')?.checked;
+  const grupoIntercessao = document.getElementById('grupoIntercessao')?.checked;
+  const contatos = [];
+  document.querySelectorAll('.contato-checkbox:checked').forEach(cb => {
+    const dizimista = cb.getAttribute('data-dizimista');
+    const ministerio = cb.getAttribute('data-ministerio');
+    if (grupoDizimistas && dizimista !== 'Sim') return;
+    if (grupoLouvor && ministerio !== 'Louvor') return;
+    if (grupoIntercessao && ministerio !== 'Intercessão') return;
+    contatos.push({ nome: cb.getAttribute('data-nome'), numero: cb.getAttribute('data-numero') });
+  });
+  return contatos;
+}
+
+function enviarWhatsApp() {
+  const msg = document.getElementById('mensagemWhatsapp').value;
+  const contatos = getContatosSelecionados();
+  if (!msg.trim()) { alert('Digite uma mensagem!'); return; }
+  if (!contatos.length) { alert('Selecione pelo menos um contato!'); return; }
+  const div = document.createElement('div');
+  div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:10000';
+  const links = contatos.map(c => {
+    const num = c.numero.replace(/\D/g,'');
+    const full = num.length === 11 ? `55${num}` : num.length === 13 ? num : `55${num}`;
+    return `<a href="https://wa.me/${full}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" style="display:block;margin:5px 0;padding:8px 12px;background:#dcfce7;border-radius:10px;text-decoration:none;color:#276749"><i class="fab fa-whatsapp"></i> ${c.nome} <small>(${c.numero})</small></a>`;
+  }).join('');
+  div.innerHTML = `<div style="background:white;border-radius:20px;padding:20px;max-width:450px;width:90%;max-height:80vh;overflow:auto">
+    <h3 style="margin-bottom:10px"><i class="fab fa-whatsapp" style="color:#25d366"></i> Enviar para ${contatos.length} contato(s)</h3>
+    <p style="font-size:12px;color:#a0aec0;margin-bottom:15px">Clique em cada nome para abrir o WhatsApp:</p>
+    <div style="max-height:50vh;overflow:auto">${links}</div>
+    <button class="btn btn-primary" onclick="this.closest('div[style]').remove()" style="margin-top:15px;width:100%">Fechar</button>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+const hoje = new Date().toISOString().split('T')[0];
+['entradaData','saidaData','eventoData','dizimoData'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.value = hoje;
+});
+const mesAnterior = new Date();
+mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+const el1 = document.getElementById('extratoDataInicio');
+const el2 = document.getElementById('extratoDataFim');
+if (el1) el1.value = mesAnterior.toISOString().split('T')[0];
+if (el2) el2.value = hoje;
+
+atualizarPreviewMensagem();
+carregarDados();
+carregarSelectMinisterios();
+carregarSelectCategorias();
+carregarListaCategorias();
+
+// Auto-login por sessão
+const sessao = sessionStorage.getItem('usuarioLogado');
+if (sessao) {
+  usuarioAtual = JSON.parse(sessao);
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('userName').textContent = usuarioAtual.nome;
+  document.getElementById('userAvatar').textContent = usuarioAtual.nome.charAt(0).toUpperCase();
+  const roles = { admin:'Administrador', tesouraria:'Tesouraria', administracao:'Administração', pastor:'Pastor' };
+  document.getElementById('userRole').textContent = roles[usuarioAtual.role] || 'Usuário';
+  const p = getPermissoes(usuarioAtual.role);
+  gerarMenu(p);
+  inicializarApp(p);
+}
+</script>
+</body>
+</html>
